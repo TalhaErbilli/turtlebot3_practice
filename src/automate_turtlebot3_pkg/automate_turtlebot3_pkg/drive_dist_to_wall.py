@@ -8,12 +8,13 @@ from sensor_msgs.msg import LaserScan
 
 
 class AutomateTurtlebot(Node):
-    def __init__(self):
+    def __init__(self, node_name: str = 'automate_turtlebot', **kwargs: dict):
+        super(AutomateTurtlebot, self).__init__(node_name=node_name, **kwargs)
         qos = QoSProfile(depth=1)
         # TODO: change pub topic name -> Done
         self.control_publisher = self.create_publisher(Twist, "/cmd_vel", qos)
         # TODO: change sub topic ->
-        self.create_subscriber(LaserScan, "/scan", self.subscribe_callback)
+        self.create_subscription(LaserScan, "/scan", self.subscribe_callback, qos)
 
     def subscribe_callback(self, msg):
         """
@@ -37,14 +38,14 @@ class AutomateTurtlebot(Node):
         self.scan_ranges = msg.ranges
         self.init_scan_state = True
 
-    def calc_distance_to_wall(self, LaserScan): #Float
+    def calc_distance_to_wall(self, LaserScan) -> float:
         # TODO implement get min distance from LaserScan -> Done
         # NOTE: use range_min -> I did this similarly to the Twist
         msg = LaserScan
         msg.min_distance = min(self.scan_ranges)
         return msg
 
-    def create_turnleft_msg(self, Twist): #Twist
+    def create_turnleft_msg(self, Twist) -> Twist:
         # TODO: implement here -> tried some values, I will change this when I see how it moves
         msg = Twist()
         msg.linear.x = 0,2
@@ -55,7 +56,7 @@ class AutomateTurtlebot(Node):
         msg.angular.z = 0
         return msg
 
-    def create_forward_msg(self, Twist): #Twist
+    def create_forward_msg(self, Twist) -> Twist:
         # TODO: implement here -> done
         msg = Twist()
         msg.linear.x = 1
@@ -66,7 +67,7 @@ class AutomateTurtlebot(Node):
         msg.angular.z = 0
         return msg
 
-    def create_stop_msg(self): #Twist
+    def create_stop_msg(self) -> Twist:
         # TODO: implement here -> Done
         msg = Twist()
         msg.linear.x = 0
