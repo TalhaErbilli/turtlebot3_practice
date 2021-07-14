@@ -38,3 +38,4 @@ __pycache__/*
 *.pkl
 *.pth.tar
 *.egg-info
+*.vscode

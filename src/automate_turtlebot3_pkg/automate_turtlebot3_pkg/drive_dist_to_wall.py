@@ -20,9 +20,10 @@ class AutomateTurtlebot(Node):
         """
         this function is executed every subscription.
         """
-        #try:
+        
         min_distance = self.calc_distance_to_wall(scan)
         print(min_distance)
+        
         if min_distance < 0.7:
             print("turn left")
             pub_msg = self.create_turnleft_msg()
@@ -31,9 +32,6 @@ class AutomateTurtlebot(Node):
             pub_msg = self.create_forward_msg()
         self.control_publisher.publish(pub_msg)
 
-        #finally:
-            #stop_msg = self.create_stop_msg()
-            #self.control_publisher.publish(stop_msg)
 
 
     def calc_distance_to_wall(self, scan: LaserScan) -> float:
@@ -46,7 +44,8 @@ class AutomateTurtlebot(Node):
         #print(len(list_distance))
         #print(max(list_distance))  # you can see the value of scan.range_max (3.5)
         #print(min(list_distance))  # you can see the value of scan.range_min (0.0)
-        
+        #print("angle min", scan.angle_min)
+        #print("angle max", scan.angle_max)
         
         min_distance = scan.ranges[0]
        
