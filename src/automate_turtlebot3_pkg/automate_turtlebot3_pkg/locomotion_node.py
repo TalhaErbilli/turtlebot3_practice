@@ -4,25 +4,29 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from geometry_msgs.msg import Twist
-from sensor_msgs.msg import LaserScan
+from sensor_msgs.msg import Range
 
 
-class AutomateTurtlebot(Node):
+class Locomotion(Node):
     def __init__(self, node_name: str = 'automate_turtlebot', **kwargs: dict):
-        super(AutomateTurtlebot, self).__init__(node_name=node_name, **kwargs)
+        super(Locomotion, self).__init__(node_name=node_name, **kwargs)
         qos = QoSProfile(depth=1)
-        # TODO: change pub topic name -> Done
-        self.control_publisher = self.create_publisher(Twist, "/cmd_vel", qos)
-        # TODO: change sub topic ->
-        self.create_subscription(LaserScan, "/scan", self.subscribe_callback, qos)
 
-    def subscribe_callback(self, scan: LaserScan):
+        # We still need the same here
+        self.control_publisher = self.create_publisher(Twist, "/cmd_vel", qos)
+
+        # subscribing to my own topic: min_distance_front, this is not working yet because I think Range is publishing 3 values now..
+        self.create_subscription(Range, "/min_distance_front", self.subscribe_callback, qos)
+
+    def subscribe_callback(self, min_distance_front: Range):
         """
         this function is executed every subscription.
-        """
-        
-        min_distance_front = self.calc_distance_to_wall(scan)
-        print(min_distance_front)
+        """   
+           
+
+        min_distance_front = min_distance_front.range
+
+        print("min distance front:  ", min_distance_front)
 
         if min_distance_front < 0.7:
             print("turn left")
@@ -33,26 +37,7 @@ class AutomateTurtlebot(Node):
         self.control_publisher.publish(pub_msg)
 
 
-
-    def calc_distance_to_wall(self, scan: LaserScan) -> float:
-        # TODO implement get min distance from LaserScan -> Done
-        # NOTE: use range_min -> I did this similarly to the Twist
-        
-        #scan.range_min = 0.0
-        #scan.range_max = 3.5
-        #list_distance = scan.ranges
-        #print(len(list_distance))
-        #print(max(list_distance))  # you can see the value of scan.range_max (3.5)
-        #print(min(list_distance))  # you can see the value of scan.range_min (0.0)
-        #print("angle min", scan.angle_min)
-        #print("angle max", scan.angle_max)
-        
-        min_distance_front = scan.ranges[0]
-       
-        return min_distance_front
-
     def create_turnleft_msg(self) -> Twist:
-        # TODO: implement here -> tried some values, I will change this when I see how it moves
         turn_left = Twist()
         turn_left.linear.x = 0.0
         turn_left.linear.y = 0.
@@ -63,7 +48,6 @@ class AutomateTurtlebot(Node):
         return turn_left
 
     def create_forward_msg(self) -> Twist:
-        # TODO: implement here -> done
         fwd_msg = Twist()
         fwd_msg.linear.x = 0.3
         fwd_msg.linear.y = 0.
@@ -74,8 +58,6 @@ class AutomateTurtlebot(Node):
         return fwd_msg
 
     def create_stop_msg(self) -> Twist:
-        # TODO: implement here -> Done
-    
         stop_drive = Twist()
         stop_drive.linear.x = 0.0
         stop_drive.linear.y = 0.0
@@ -88,7 +70,7 @@ class AutomateTurtlebot(Node):
 
 def main():
     rclpy.init()
-    node = AutomateTurtlebot()
+    node = Locomotion()
     rclpy.spin(node)
 
 
