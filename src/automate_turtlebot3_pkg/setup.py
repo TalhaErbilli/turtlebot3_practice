@@ -22,8 +22,10 @@ setup(
         'console_scripts': [
             'automate_turtlebot3_node = automate_turtlebot3_pkg.automate_turtlebot3_node:main',
             'drive_dist_to_wall = automate_turtlebot3_pkg.drive_dist_to_wall:main',
-            'laser_node = automate_turtlebot3_pkg.laser_node:main',
+            'front_laser_node = automate_turtlebot3_pkg.front_laser_node:main',
             'locomotion_node = automate_turtlebot3_pkg.locomotion_node:main',
+            'wall_follower_node = automate_turtlebot3_pkg.wall_follower_node:main',
+            'lidar_node = automate_turtlebot3_pkg.Lidar_node:main',
         ],
     },
 )
