@@ -1,0 +1,6 @@
+find_package(automate_turtlebot3_pkg REQUIRED)
+
+automate_turtlebot3_pkg(${PROJECT_NAME}
+  "msg/three_float.msg"
+  #"srv/AddThreeInts.srv"
+ )

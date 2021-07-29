@@ -7,6 +7,8 @@ from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Range
 
 
+
+
 class Locomotion(Node):
     def __init__(self, node_name: str = 'automate_turtlebot', **kwargs: dict):
         super(Locomotion, self).__init__(node_name=node_name, **kwargs)
@@ -26,7 +28,7 @@ class Locomotion(Node):
 
         min_distance_front = min_distance_front.range
 
-        print("min distance front:  ", min_distance_front)
+        #print("min distance front:  ", min_distance_front)
 
         if min_distance_front < 0.7:
             print("turn left")

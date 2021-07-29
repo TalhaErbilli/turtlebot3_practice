@@ -2,11 +2,13 @@
 
 import rclpy
 import numpy as np
-from std_msgs.msg import Float32MultiArray
+from sensor_msgs import msg
+from sensor_msgs.msg import PointCloud2 as pc2
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Range, LaserScan
+from std_msgs.msg import Float32MultiArray
 
 
 class AutomateTurtlebot(Node):
@@ -14,9 +16,11 @@ class AutomateTurtlebot(Node):
         super(AutomateTurtlebot, self).__init__(node_name=node_name, **kwargs)
         qos = QoSProfile(depth=1)
         
+        #Subscribing to /scan so calc_dist_to_wall has the input data to work with
         self.create_subscription(LaserScan, "/scan", self.subscribe_callback, qos)
 
-        self.control_publisher = self.create_publisher(Float32MultiArray, "/min_dist", qos)
+        #Trying out a good format to publish in, so the wall_follower gets the data.
+        self.control_publisher = self.create_publisher(Float32MultiArray, "/min_dis", qos)
 
         # self.control_publisher = [
         #     self.create_publisher(Range, "/min_dis_front", qos),
@@ -33,21 +37,19 @@ class AutomateTurtlebot(Node):
         
         print("\n \n \n --------------------------------------- \n \n" 
         "\n min distance_front:  ", min_distance_front,"\n \n"
-        "min_distance_left:  ", min_distance_left,"\n \n" 
-        "min_distance_right:  ", min_distance_right,
+        " min_distance_left:  ", min_distance_left,"\n \n" 
+        " min_distance_right:  ", min_distance_right,
         "\n \n \n --------------------------------------- \n \n \n \n \n")
 
-        tmp = [min_distance_front, min_distance_left, min_distance_right]
-        pub_msg = Float32MultiArray(data = tmp)
-        self.control_publisher.publish(pub_msg)
+        float_array = Float32MultiArray(data = [min_distance_front, min_distance_left, min_distance_right])
+        self.control_publisher.publish(float_array)
 
-        # pub_msg_left= Range()
-        # pub_msg_left.range = min_distance_left        
 
-        # pub_msg_right= Range()
-        # pub_msg_right.range = min_distance_right
+       # cloud_out = self.calc_distance_to_wall(scan)
+       # self.control_publisher.publish(cloud_out)
 
-        # Here I am publishing min_distance_front
+
+        # Here I am publishing min_dist
         # self.control_publisher[0].publish(pub_msg_front)
         # self.control_publisher[1].publish(pub_msg_left)
         # self.control_publisher[2].publish(pub_msg_right)
@@ -57,9 +59,9 @@ class AutomateTurtlebot(Node):
 
         min_distance_front = scan.ranges[0]
 
-        #90° × π/180 = 1,571rad
-        left_index = int((np.pi/180 *90)/scan.angle_increment)
-        right_index = int((np.pi/180 *270)/scan.angle_increment)
+        # degree° × π/180 = 1,571rad
+        left_index = int((np.pi/180 *45)/scan.angle_increment)
+        right_index = int((np.pi/180 *315)/scan.angle_increment)
     
         min_distance_left = scan.ranges[left_index]
         min_distance_right = scan.ranges[right_index]
