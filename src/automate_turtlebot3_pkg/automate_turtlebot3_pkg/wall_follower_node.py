@@ -67,23 +67,36 @@ class wall_follow(Node):
         # "\n \n \n --------------------------------------- \n \n \n \n \n")
 
         self.control_publisher.publish(self.create_forward_msg())
-        print("drive_fwd", float_array[0])
+        print("drive_fwd, \n \nfront sensor:   ", float_array[0])
 
-        if float_array[0] < 0.5:
-            self.control_publisher.publish(self.create_stop_msg())
-            print("stopped robot for a sec")
+        if float_array[0]  < 0.5:
+            #after stopping robot, let's turn a perfect 90 degrees.
+            self.control_publisher.publish(self.create_turnright_msg())
+            print("turning robot _R_:  ")
+            #during the turn, we need to check the base_link transform
+            #and compare this to the transformation we need.
+            old_yaw = self.tf_timer_callback()    
+            new_yaw = self.calculate_new_yaw()
             
-        #after stopping robot, let's turn a perfect 90 degrees.
-        self.control_publisher.publish(self.create_turnright_msg())
-        print("turning robot _R_:  ")
-        #during the turn, we need to check the base_link transform
-        #and compare this to the transformation we need.
-        old_yaw = self.tf_timer_callback()    
-        new_yaw = self.calculate_new_yaw()
+            if old_yaw == new_yaw:
+                self.control_publisher.publish(self.create_forward_msg())
+                print("fwd 2")  
 
-        if new_yaw == old_yaw:
-            self.control_publisher.publish(self.create_stop_msg())
-            print("stopped robot for a sec 2")          
+
+        if float_array[1]  < 0.5:
+            #after stopping robot, let's turn a perfect 90 degrees.
+            self.control_publisher.publish(self.create_turnright_msg())
+            print("turning robot _R_:  ")
+            #during the turn, we need to check the base_link transform
+            #and compare this to the transformation we need.
+            old_yaw = self.tf_timer_callback()    
+            new_yaw = self.calculate_new_yaw()
+
+            if old_yaw == new_yaw:
+                self.control_publisher.publish(self.create_forward_msg())
+                print("fwd 2")  
+
+        
 
 
 
@@ -145,7 +158,7 @@ class wall_follow(Node):
     def calculate_new_yaw(self):
         old_yaw = self.tf_timer_callback()
         #print("old yaw:  ", old_yaw)
-        angle_of_turn = 90.0
+        angle_of_turn = 90
         #we are adding the turn to the yaw
         new_yaw = old_yaw + angle_of_turn
         #print("new yaw:  ", new_yaw)
