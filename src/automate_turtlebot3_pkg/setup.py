@@ -25,6 +25,7 @@ setup(
             'front_laser_node = automate_turtlebot3_pkg.front_laser_node:main',
             'locomotion_node = automate_turtlebot3_pkg.locomotion_node:main',
             'wall_follower_node = automate_turtlebot3_pkg.wall_follower_node:main',
+            'wall_follower_v2 = automate_turtlebot3_pkg.Wall_Follower_v2:main',
             'lidar_node = automate_turtlebot3_pkg.Lidar_node:main',
         ],
     },
