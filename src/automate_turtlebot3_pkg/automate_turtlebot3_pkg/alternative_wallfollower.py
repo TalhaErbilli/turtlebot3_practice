@@ -1,3 +1,4 @@
+from typing import ForwardRef
 import rclpy
 import numpy as np
 from rclpy.node import Node
@@ -20,7 +21,7 @@ class WallFollower(Node):
         # logic variable
         self.target_yaw = 0.
         self.current_state = 'start'
-        self.turn_deg = 87.
+        self.turn_left_deg = 87.
 
         # Declaring cmd_vel to publish Twist
         self.control_publisher = self.create_publisher(Twist, "/cmd_vel", qos)
@@ -128,7 +129,6 @@ class WallFollower(Node):
         # 2. Conditions for driving forward    
         elif self.current_state == 'forward':
             if self.distance_array[0] > 0.5:
-                self.target_yaw = self.current_yaw + np.deg2rad(self.turn_deg)
                 self.control_publisher.publish(self.create_forward_msg())
                 print( self.current_state,"2","\nFront sensor:  ", self.distance_array[0],"[m], \n\nCurrent_yaw:  ", np.rad2deg(self.current_yaw), "\n", "Target yaw:  ", np.rad2deg(self.target_yaw), "\n\n")
             else:
@@ -136,12 +136,27 @@ class WallFollower(Node):
 
         # 3. condition for turning right
         elif self.current_state == 'turn_right':
+            self.target_yaw = self.current_yaw + np.deg2rad(self.turn_deg)
             if self.target_yaw > np.deg2rad(180):
                 self.target_yaw = self.target_yaw - np.deg2rad(360)
             self.control_publisher.publish(self.create_turnright_msg())
             print( self.current_state,"3","\nFront sensor:  ", self.distance_array[0],"[m], \n\nCurrent_yaw:  ", np.rad2deg(self.current_yaw), "\n", "Target yaw:  ", np.rad2deg(self.target_yaw), "\n\n")
-            if self.current_yaw >= self.target_yaw:
-                self.current_state = 'forward'
+        
+        # 4. Conditions for turning left
+        elif self.target_yaw < self.current_yaw:
+            self.current_state = 'turn_left'        
+            if self.target_yaw <np.deg2rad(-180):
+                self.target_yaw = self.target_yaw + np.deg2rad(360)
+            self.control_publisher.publish(self.create_turnleft_msg())
+            print( self.current_state,"4","\nFront sensor:  ", self.distance_array[0],"[m], \n\nCurrent_yaw:  ", np.rad2deg(self.current_yaw), "\n", "Target yaw:  ", np.rad2deg(self.target_yaw), "\n\n")
+                    
+        # 5. conditions to drive back straight.
+        elif self.current_yaw == self.target_yaw:
+            self.current_state = 'forward'
+            print( self.current_state,"5")
+
+
+
 
 
 def main():
