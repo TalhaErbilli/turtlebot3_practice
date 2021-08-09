@@ -60,8 +60,8 @@ class AutomateTurtlebot(Node):
         min_distance_front = scan.ranges[0]
 
         # degree° × π/180 = 1,571rad
-        left_index = int((np.pi/180 *15)/scan.angle_increment)
-        right_index = int((np.pi/180 *345)/scan.angle_increment)
+        left_index = int((np.pi/180 *90)/scan.angle_increment)
+        right_index = int((np.pi/180 *270)/scan.angle_increment)
     
         min_distance_left = scan.ranges[left_index]
         min_distance_right = scan.ranges[right_index]
